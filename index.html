@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GPS Navigator</title>
+    <link rel="stylesheet" href="main/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  </head>
+  <body>
+    <div id="navbar">
+      <h1>⚠️ Disaster Recovery Route Planner</h1>
+    </div>
+    <div id="body-container">
+      <!-- Sidebar with controls -->
+      <div id="sidebar">
+        <h3>Plan Evacuation Route</h3>
+
+        <div>
+          <label for="start-location">Disaster Area :</label>
+          <select id="start-location" onchange="setStartPoint()">
+            <option value="" disabled selected>Select Disaster Location</option>
+            <!-- Disaster locations will be populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label for="end-location">Relief Center :</label>
+          <select id="end-location" onchange="setEndPoint()">
+            <option value="" disabled selected>Select Relief Center</option>
+            <!-- Relief centers will be populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label for="distance">Total Distance :</label>
+          <input type="text" id="distance" readonly />
+
+          <label for="time">Estimated Time :</label>
+          <input type="text" id="time" readonly />
+        </div>
+
+        <button onclick="findPath()">Find Shortest Path</button>
+
+        <h3>Map Controls</h3>
+        <button onclick="resetMap()">Reset Map</button>
+        <button onclick="recenterMap()">📍 Recenter to My Location</button>
+        <button onclick="recenterToRoute()">🌏 Recenter</button>
+      </div>
+
+      <!-- Map -->
+      <div id="map"></div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div
+      id="loading-overlay"
+      style="
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: none; /* hidden by default */
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      "
+    >
+      <div class="spinner"></div>
+      <p>Computing shortest path…</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script src="main/script.js"></script>
+  </body>
+</html>
