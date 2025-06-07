@@ -42,7 +42,7 @@ exports.fetchStreetData = async (lat, lng) => {
     way
       ["highway"]
       ["highway"!~"footway|cycleway|path|pedestrian|steps|track|service"]
-      (around:3000, ${lat}, ${lng});
+      (around:10000, ${lat}, ${lng});
   );
   out body;
   >;
