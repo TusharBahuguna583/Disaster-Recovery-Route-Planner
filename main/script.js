@@ -45,7 +45,7 @@ async function renderDisasterLocations() {
   try {
     // Replace with your actual backend API endpoint
     const response = await fetch(
-      "http://localhost:4000/api/v1/disaster/disaster-locations"
+      "https://disaster-recovery-route-planner-backend.onrender.com/api/v1/disaster/disaster-locations"
     );
 
     if (!response.ok) {
@@ -75,7 +75,7 @@ async function populateReliefCenters(disasterEvent) {
   try {
     // Replace with your actual backend API endpoint
     const response = await fetch(
-      "http://localhost:4000/api/v1/rescue/relief-centers",
+      "https://disaster-recovery-route-planner-backend.onrender.com/api/v1/rescue/relief-centers",
       {
         method: "POST",
         headers: {
@@ -332,7 +332,7 @@ async function findPath() {
       lon: parseFloat(destinationInput.lng),
     };
 
-    const response = await fetch("http://localhost:4000/api/v1/shortest-path", {
+    const response = await fetch("https://disaster-recovery-route-planner-backend.onrender.com/api/v1/shortest-path", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
