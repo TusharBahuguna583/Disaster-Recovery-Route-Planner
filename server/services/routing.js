@@ -35,7 +35,13 @@ exports.findClosestNode = (lat, lon, data) => {
   return closestNode;
 };
 
-exports.fetchStreetData = async (lat, lng) => {
+const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://lz4.overpass-api.de/api/interpreter"
+];
+
+exports.fetchStreetData = async (lat, lng, retries = 3) => {
   const query = `
   [out:json][timeout:25];
   (
@@ -47,28 +53,41 @@ exports.fetchStreetData = async (lat, lng) => {
   out body;
   >;
   out skel qt;
-`;
+  `;
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds
+  const encodedQuery = encodeURIComponent(query);
 
-  try {
-    const response = await fetch(
-      `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-        query
-      )}`,
-      { signal: controller.signal }
-    );
+  for (let i = 0; i < retries; i++) {
+    for (const endpoint of OVERPASS_ENDPOINTS) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s
 
-    clearTimeout(timeoutId);
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    console.error("Failed to fetch street data:", error);
-    throw error;
+      try {
+        const response = await fetch(`${endpoint}?data=${encodedQuery}`, {
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          console.warn(`Overpass API returned status ${response.status} from ${endpoint}`);
+          continue;
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error(`Attempt ${i + 1}: Failed to fetch from ${endpoint}`, error);
+        // Wait a bit before retrying
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    }
   }
+
+  throw new Error("All attempts to fetch Overpass data failed.");
 };
+
 
 exports.buildGraph = (data) => {
   const graph = {};
