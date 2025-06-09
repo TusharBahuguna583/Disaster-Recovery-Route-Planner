@@ -1,3 +1,5 @@
+const PriorityQueue = require("js-priority-queue");
+
 function toRad(deg) {
   return (deg * Math.PI) / 180;
 }
@@ -38,7 +40,7 @@ exports.findClosestNode = (lat, lon, data) => {
 const OVERPASS_ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
-  "https://lz4.overpass-api.de/api/interpreter"
+  "https://lz4.overpass-api.de/api/interpreter",
 ];
 
 exports.fetchStreetData = async (lat, lng, retries = 3) => {
@@ -48,7 +50,7 @@ exports.fetchStreetData = async (lat, lng, retries = 3) => {
     way
       ["highway"]
       ["highway"!~"footway|cycleway|path|pedestrian|steps|track|service"]
-      (around:10000, ${lat}, ${lng});
+      (around:5000, ${lat}, ${lng});
   );
   out body;
   >;
@@ -70,7 +72,9 @@ exports.fetchStreetData = async (lat, lng, retries = 3) => {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          console.warn(`Overpass API returned status ${response.status} from ${endpoint}`);
+          console.warn(
+            `Overpass API returned status ${response.status} from ${endpoint}`
+          );
           continue;
         }
 
@@ -78,7 +82,10 @@ exports.fetchStreetData = async (lat, lng, retries = 3) => {
         return data;
       } catch (error) {
         clearTimeout(timeoutId);
-        console.error(`Attempt ${i + 1}: Failed to fetch from ${endpoint}`, error);
+        console.error(
+          `Attempt ${i + 1}: Failed to fetch from ${endpoint}`,
+          error
+        );
         // Wait a bit before retrying
         await new Promise((r) => setTimeout(r, 1000));
       }
@@ -87,7 +94,6 @@ exports.fetchStreetData = async (lat, lng, retries = 3) => {
 
   throw new Error("All attempts to fetch Overpass data failed.");
 };
-
 
 exports.buildGraph = (data) => {
   const graph = {};
@@ -115,8 +121,6 @@ exports.buildGraph = (data) => {
 
   return { graph, nodeCoords };
 };
-
-const PriorityQueue = require("js-priority-queue");
 
 exports.dijkstra = (graph, start, end) => {
   const distances = {};
